@@ -7,9 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class DemoShoppingSiteApplicationTests {
 
     @Test
-    void contextLoads() {
-
+    void test1(){
 
     }
-
 }

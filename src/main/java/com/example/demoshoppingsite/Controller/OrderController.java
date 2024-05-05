@@ -1,22 +1,25 @@
 package com.example.demoshoppingsite.Controller;
 
 import com.example.demoshoppingsite.model.Order;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.example.demoshoppingsite.model.Response;
+import com.example.demoshoppingsite.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/order")
 public class OrderController {
 
-    @PostMapping
-    public ResponseEntity placeOrder(Order order){
-        return new ResponseEntity(HttpStatus.OK);
+    @Autowired
+    private OrderService orderService;
+
+    @PostMapping("/purchase")
+    public Response placeOrder(Order order){
+        return orderService.placeOrder(order);
     }
 
-    @DeleteMapping
-    public void cancelOrder(){
-
+    @DeleteMapping("/cancelOrder")
+    public Response cancelOrder(Order order){
+        return orderService.cancelOrder(order);
     }
 }
