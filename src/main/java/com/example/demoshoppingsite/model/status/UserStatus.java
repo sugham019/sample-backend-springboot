@@ -3,8 +3,10 @@ package com.example.demoshoppingsite.model.status;
 public enum UserStatus implements ResponseStatus{
 
     USERNAME_EXISTS(1),
-    PASSWORD_WRONG(2),
-    USER_CREATED(3);
+    USER_CREATED(2),
+    PASSWORD_WRONG(3),
+    USERNAME_WRONG(4),
+    CORRECT_INFORMATION(5);
 
     private final int status;
 
