@@ -32,4 +32,16 @@ public class UserServiceTests {
 //        assertEquals(UserStatus.PASSWORD_WRONG.getStatus(), responseObj.getResponseStatus().getStatus());
 //        assertEquals(UserStatus.USERNAME_WRONG.getStatus(), responseObj.getResponseStatus().getStatus());
     }
+
+    @Test
+    public void changePassword(){
+        Response response = userService.changePassword("Sugham Kharel", "test123", "test12345");
+        assertEquals(UserStatus.PASSWORD_UPDATED.getStatus(), response.getResponseStatus().getStatus());
+    }
+
+    @Test
+    public void deleteUser(){
+        Response response = userService.deleteAccount("Sugham Kharel", "test12345");
+        assertEquals(UserStatus.ACCOUNT_DELETED.getStatus(), response.getResponseStatus().getStatus());
+    }
 }
