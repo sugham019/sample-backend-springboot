@@ -1,8 +1,9 @@
 package com.example.demoshoppingsite.service;
 
 import com.example.demoshoppingsite.model.Item;
-import com.example.demoshoppingsite.model.Response;
 import com.example.demoshoppingsite.repository.ProductCatalogRepository;
+import com.example.demoshoppingsite.exceptions.OutOfStockException;
+import com.example.demoshoppingsite.exceptions.PendingOrderException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,44 +13,62 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
     @Autowired
     private ProductCatalogRepository productCatalogRepository;
 
+
     @Override
-    public boolean addProduct(String name, int price, int no){
-        if(productExists(name)) return false;
+    public Item addProduct(String name, int price, int no) {
 
         Item item = new Item(name, price, no);
         productCatalogRepository.save(item);
-        return true;
+        return item;
     }
 
     @Override
-    public boolean removeProduct(String name) {
-        if(!productExists(name)) return false;
-        productCatalogRepository.deleteById(name);
-        return true;
+    public void removeProduct(Long id) throws PendingOrderException, NotAvailableException {
+
+        if(!productCatalogRepository.existsById(id))
+            throw new NotAvailableException("Could not find product with given Id");
+
+        Item item = productCatalogRepository.findById(id).get();
+        if(item.hasPendingOrders())
+            throw new PendingOrderException("Their are still pending orders.");
+
+        productCatalogRepository.delete(item);
     }
 
     @Override
-    public boolean updateStock(String name, int number) {
-        if(!productExists(name)) return false;
+    public void updateStock(Long id, int num) throws NotAvailableException, OutOfStockException {
 
-        Item item = productCatalogRepository.findById(name).get();
-        item.setTotal(item.getTotal()+number);
+        if(!productCatalogRepository.existsById(id))
+            throw new NotAvailableException("Could not find product with given Id");
+
+        Item item = productCatalogRepository.findById(id).get();
+        int total_stock = item.getTotal() + num;
+        if(total_stock < 0)
+            throw new OutOfStockException();
+
+        item.setTotal(total_stock);
         productCatalogRepository.save(item);
-        return true;
     }
 
     @Override
-    public boolean updatePrice(String name, int price) {
-        if(!productExists(name)) return false;
+    public void updatePrice(Long id, int price) throws NotAvailableException{
 
-        Item item = productCatalogRepository.findById(name).get();
+        if(!productCatalogRepository.existsById(id))
+            throw new NotAvailableException("Could not find product with given Id");
+
+        Item item = productCatalogRepository.findById(id).get();
         item.setPrice(price);
         productCatalogRepository.save(item);
-        return true;
     }
 
     @Override
-    public boolean productExists(String name) {
-        return productCatalogRepository.existsById(name);
+    public Item getProductById(Long id) throws NotAvailableException {
+
+        if(!productCatalogRepository.existsById(id))
+            throw new NotAvailableException("Could not find product with given Id");
+
+        Item item = productCatalogRepository.findById(id).get();
+        return item;
     }
+
 }

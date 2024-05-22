@@ -1,14 +1,20 @@
 package com.example.demoshoppingsite.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "items")
 public class Item {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY,  cascade = CascadeType.ALL)
+    private List<Order> orders;
+
     private String name;
     private int price;
     private int total;
@@ -25,6 +31,10 @@ public class Item {
         return total;
     }
 
+    public boolean hasPendingOrders(){
+        return !orders.isEmpty();
+    }
+
     public void setTotal(int total) {
         this.total = total;
     }
@@ -35,6 +45,10 @@ public class Item {
 
     public int getPrice(){
         return price;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {

@@ -1,16 +1,13 @@
 package com.example.demoshoppingsite.service;
 
-import com.example.demoshoppingsite.model.Response;
-import com.example.demoshoppingsite.model.ResponseObj;
 import com.example.demoshoppingsite.model.User;
-import com.example.demoshoppingsite.model.status.ResponseStatus;
-import com.example.demoshoppingsite.model.status.UserStatus;
 import com.example.demoshoppingsite.repository.UserRepository;
+import com.example.demoshoppingsite.exceptions.AuthenticationException;
+import com.example.demoshoppingsite.exceptions.DuplicateException;
+import com.example.demoshoppingsite.exceptions.PendingOrderException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -20,64 +17,54 @@ public class UserServiceImpl implements UserService{
 
 
     @Override
-    public ResponseObj<User> createUser(User user) {
+    public void createUser(User user) throws DuplicateException {
 
+        user.clearOrders();
         if(userRepository.existsById(user.getName())){
-            return new ResponseObj<User>(UserStatus.USER_EXISTS);
+            throw new DuplicateException("User already Exists with the given id");
         }
-
-        User user1 = new User(user.getName(), user.getAge(), user.getPassword());
-        userRepository.save(user1);
-        ResponseObj<User> responseObj = new ResponseObj<>(UserStatus.USER_CREATED);
-        responseObj.setObject(user1);
-        return responseObj;
+        userRepository.save(user);
     }
 
 
     @Override
-    public ResponseObj<User> authenticate(String username, String password) {
+    public User authenticate(String username, String password) throws AuthenticationException {
 
         if(!userRepository.existsById(username)){
-            return new ResponseObj<User>(UserStatus.USERNAME_WRONG);
+            throw new AuthenticationException("Could not find user with given Id");
         }
 
         User user = userRepository.findById(username).get();
         if(!user.getPassword().equals(password)){
-            return new ResponseObj<User>(UserStatus.PASSWORD_WRONG);
+            throw new AuthenticationException("Incorrect password");
         }
-        ResponseObj<User> responseObj = new ResponseObj<>(UserStatus.CORRECT_INFORMATION);
-        responseObj.setObject(user);
-        return responseObj;
+        return user;
     }
 
     @Override
-    public Response changePassword(String username, String oldPassword, String newPassword) {
+    public void changePassword(String username, String oldPassword, String newPassword) throws AuthenticationException{
 
         if(!userRepository.existsById(username)){
-            return new Response(UserStatus.USER_DOESNT_EXIST);
+            throw new AuthenticationException("Incorrect Id");
         }
         User user = userRepository.findById(username).get();
         if(!user.getPassword().equals(oldPassword)){
-            return new Response(UserStatus.PASSWORD_WRONG);
+            throw new AuthenticationException("Incorrect password");
         }
         user.setPassword(newPassword);
         userRepository.save(user);
-        return new Response(UserStatus.PASSWORD_UPDATED);
     }
 
     @Override
-    public Response deleteAccount(String username, String password) {
+    public void deleteAccount(String username, String password) throws AuthenticationException, PendingOrderException {
 
         if(!userRepository.existsById(username)){
-            return new Response(UserStatus.USER_DOESNT_EXIST);
+            throw new AuthenticationException("User does not exists");
         }
         User user = userRepository.findById(username).get();
         if(!user.getPassword().equals(password)){
-            return new Response(UserStatus.PASSWORD_WRONG);
+            throw new AuthenticationException("Incorrect password");
         }
         userRepository.deleteById(username);
-        return new Response(UserStatus.ACCOUNT_DELETED);
     }
-
-
 }

@@ -1,14 +1,13 @@
 package com.example.demoshoppingsite.service;
 
-import com.example.demoshoppingsite.model.Order;
-import com.example.demoshoppingsite.model.Response;
-import com.example.demoshoppingsite.model.ResponseObj;
-import com.example.demoshoppingsite.model.User;
-import org.springframework.http.ResponseEntity;
+import com.example.demoshoppingsite.model.*;
+import com.example.demoshoppingsite.exceptions.NotFoundException;
+import com.example.demoshoppingsite.exceptions.OutOfStockException;
 
 public interface OrderService {
 
-    Response placeOrder(Order order);
-    Response cancelOrder(Order order);
-    ResponseObj<Order[]> viewCart(User user);
+    void placeOrder(User user, Item product, int no) throws OutOfStockException, NotFoundException;
+    void cancelOrder(User user, Order order);
+    void completeOrder(User user, Order order);
+    Order[] getOrders(User user);
 }
