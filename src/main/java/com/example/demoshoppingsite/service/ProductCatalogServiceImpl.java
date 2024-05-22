@@ -1,5 +1,6 @@
 package com.example.demoshoppingsite.service;
 
+import com.example.demoshoppingsite.exceptions.NotFoundException;
 import com.example.demoshoppingsite.model.Item;
 import com.example.demoshoppingsite.repository.ProductCatalogRepository;
 import com.example.demoshoppingsite.exceptions.OutOfStockException;
@@ -23,10 +24,10 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
     }
 
     @Override
-    public void removeProduct(Long id) throws PendingOrderException, NotAvailableException {
+    public void removeProduct(Long id) throws PendingOrderException, NotFoundException {
 
         if(!productCatalogRepository.existsById(id))
-            throw new NotAvailableException("Could not find product with given Id");
+            throw new NotFoundException("Could not find product with given Id");
 
         Item item = productCatalogRepository.findById(id).get();
         if(item.hasPendingOrders())
@@ -36,10 +37,10 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
     }
 
     @Override
-    public void updateStock(Long id, int num) throws NotAvailableException, OutOfStockException {
+    public void updateStock(Long id, int num) throws NotFoundException, OutOfStockException {
 
         if(!productCatalogRepository.existsById(id))
-            throw new NotAvailableException("Could not find product with given Id");
+            throw new NotFoundException("Could not find product with given Id");
 
         Item item = productCatalogRepository.findById(id).get();
         int total_stock = item.getTotal() + num;
@@ -51,10 +52,10 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
     }
 
     @Override
-    public void updatePrice(Long id, int price) throws NotAvailableException{
+    public void updatePrice(Long id, int price) throws NotFoundException{
 
         if(!productCatalogRepository.existsById(id))
-            throw new NotAvailableException("Could not find product with given Id");
+            throw new NotFoundException("Could not find product with given Id");
 
         Item item = productCatalogRepository.findById(id).get();
         item.setPrice(price);
@@ -62,10 +63,10 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
     }
 
     @Override
-    public Item getProductById(Long id) throws NotAvailableException {
+    public Item getProductById(Long id) throws NotFoundException {
 
         if(!productCatalogRepository.existsById(id))
-            throw new NotAvailableException("Could not find product with given Id");
+            throw new NotFoundException("Could not find product with given Id");
 
         Item item = productCatalogRepository.findById(id).get();
         return item;
