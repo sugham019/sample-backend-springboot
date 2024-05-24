@@ -6,9 +6,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
-@WebMvcTest(controllers = UserController.class)
-@AutoConfigureMockMvc
-public class UserControllerTests extends MockitoExtension{
-
-
-}
+//@WebMvcTest(controllers = UserController.class)
+//@AutoConfigureMockMvc
+//public class UserControllerTests extends MockitoExtension{
+//
+//
+//}

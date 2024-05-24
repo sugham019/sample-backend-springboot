@@ -40,6 +40,10 @@ public class Order {
         return user;
     }
 
+    public int getTotal(){
+        return total;
+    }
+
     public Item getProduct(){
         return product;
     }

@@ -2,6 +2,8 @@ package com.example.demoshoppingsite.service;
 
 import com.example.demoshoppingsite.exceptions.NotFoundException;
 import com.example.demoshoppingsite.model.Item;
+import com.example.demoshoppingsite.model.ProductInfo;
+import com.example.demoshoppingsite.model.User;
 import com.example.demoshoppingsite.repository.ProductCatalogRepository;
 import com.example.demoshoppingsite.exceptions.OutOfStockException;
 import com.example.demoshoppingsite.exceptions.PendingOrderException;
@@ -16,11 +18,10 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
 
 
     @Override
-    public Item addProduct(String name, int price, int no) {
+    public void addProduct(String name, int price, int no, User user) {
 
-        Item item = new Item(name, price, no);
+        Item item = new Item(name, price, no, user);
         productCatalogRepository.save(item);
-        return item;
     }
 
     @Override

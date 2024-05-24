@@ -15,15 +15,20 @@ public class Item {
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY,  cascade = CascadeType.ALL)
     private List<Order> orders;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User vendor;
+
     private String name;
-    private int price;
+    private float price;
     private int total;
 
     public Item(){}
 
-    public Item(String name, int price, int total) {
+    public Item(String name, float price, int total, User vendor) {
         this.name = name;
         this.price = price;
+        this.vendor = vendor;
         this.total = total;
     }
 
@@ -39,11 +44,15 @@ public class Item {
         this.total = total;
     }
 
-    public void setPrice(int price){
+    public User getVendor(){
+        return vendor;
+    }
+
+    public void setPrice(float price){
         this.price = price;
     }
 
-    public int getPrice(){
+    public float getPrice(){
         return price;
     }
 

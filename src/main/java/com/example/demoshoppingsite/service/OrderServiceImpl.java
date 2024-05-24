@@ -1,5 +1,6 @@
 package com.example.demoshoppingsite.service;
 
+import com.example.demoshoppingsite.exceptions.AuthenticationException;
 import com.example.demoshoppingsite.model.*;
 import com.example.demoshoppingsite.repository.OrderRepository;
 import com.example.demoshoppingsite.exceptions.NotFoundException;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class OrderServiceImpl implements OrderService{
@@ -19,16 +21,21 @@ public class OrderServiceImpl implements OrderService{
     @Autowired
     private ProductCatalogService productCatalogService;
 
+    @Autowired
+    private UserService userService;
+
     @Override
-    public void placeOrder(User user, Item product, int total) throws OutOfStockException, NotFoundException {
+    public void placeOrder(OrderInfo orderInfo) throws OutOfStockException, NotFoundException, AuthenticationException {
 
-        if(product.getTotal() < total)
-            throw new OutOfStockException();
+        Item product = productCatalogService.getProductById(orderInfo.productId());
+        User user = userService.authenticate(orderInfo.userId(), orderInfo.password());
 
+        if(product.getTotal() < orderInfo.total()){
+            throw new OutOfStockException("Out Of Stock");
+        }
         Date currentDate = new Date();
-        Order order = new Order(user, product, currentDate, total);
-
-        productCatalogService.updateStock(product.getId(), -total);
+        Order order = new Order(user, product, currentDate, orderInfo.total());
+        productCatalogService.updateStock(product.getId(), -order.getTotal());
         orderRepository.save(order);
     }
 
@@ -38,8 +45,14 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public void completeOrder(User user, Order order) {
+    public void completeOrder(Long orderId) throws NotFoundException{
 
+        Optional<Order> orderOptional = orderRepository.findById(orderId);
+        if(orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            orderRepository.delete(order);
+        }
+        throw new NotFoundException("Their are no active orders with given Id");
     }
 
     @Override
