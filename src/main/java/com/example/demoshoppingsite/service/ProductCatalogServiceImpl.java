@@ -10,12 +10,17 @@ import com.example.demoshoppingsite.exceptions.PendingOrderException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ProductCatalogServiceImpl implements ProductCatalogService{
 
-    @Autowired
-    private ProductCatalogRepository productCatalogRepository;
+    private final ProductCatalogRepository productCatalogRepository;
 
+    @Autowired
+    public ProductCatalogServiceImpl(ProductCatalogRepository productCatalogRepository){
+        this.productCatalogRepository = productCatalogRepository;
+    }
 
     @Override
     public void addProduct(String name, int price, int no, User user) {
@@ -27,10 +32,11 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
     @Override
     public void removeProduct(Long id) throws PendingOrderException, NotFoundException {
 
-        if(!productCatalogRepository.existsById(id))
+        Optional<Item> optionalItem = productCatalogRepository.findById(id);
+        if (optionalItem.isEmpty())
             throw new NotFoundException("Could not find product with given Id");
 
-        Item item = productCatalogRepository.findById(id).get();
+        Item item = optionalItem.get();
         if(item.hasPendingOrders())
             throw new PendingOrderException("Their are still pending orders.");
 
@@ -40,10 +46,11 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
     @Override
     public void updateStock(Long id, int num) throws NotFoundException, OutOfStockException {
 
-        if(!productCatalogRepository.existsById(id))
+        Optional<Item> optionalItem = productCatalogRepository.findById(id);
+        if(optionalItem.isEmpty())
             throw new NotFoundException("Could not find product with given Id");
 
-        Item item = productCatalogRepository.findById(id).get();
+        Item item = optionalItem.get();
         int total_stock = item.getTotal() + num;
         if(total_stock < 0)
             throw new OutOfStockException();
@@ -55,10 +62,11 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
     @Override
     public void updatePrice(Long id, int price) throws NotFoundException{
 
-        if(!productCatalogRepository.existsById(id))
+        Optional<Item> optionalItem = productCatalogRepository.findById(id);
+        if(optionalItem.isEmpty())
             throw new NotFoundException("Could not find product with given Id");
 
-        Item item = productCatalogRepository.findById(id).get();
+        Item item = optionalItem.get();
         item.setPrice(price);
         productCatalogRepository.save(item);
     }
@@ -66,11 +74,11 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
     @Override
     public Item getProductById(Long id) throws NotFoundException {
 
-        if(!productCatalogRepository.existsById(id))
+        Optional<Item> optionalItem = productCatalogRepository.findById(id);
+        if(optionalItem.isEmpty())
             throw new NotFoundException("Could not find product with given Id");
 
-        Item item = productCatalogRepository.findById(id).get();
-        return item;
+        return optionalItem.get();
     }
 
 }

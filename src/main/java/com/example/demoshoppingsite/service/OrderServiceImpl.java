@@ -5,6 +5,7 @@ import com.example.demoshoppingsite.model.*;
 import com.example.demoshoppingsite.repository.OrderRepository;
 import com.example.demoshoppingsite.exceptions.NotFoundException;
 import com.example.demoshoppingsite.exceptions.OutOfStockException;
+import com.example.demoshoppingsite.repository.ProductCatalogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +16,16 @@ import java.util.Optional;
 public class OrderServiceImpl implements OrderService{
 
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
+    private final ProductCatalogService productCatalogService;
+    private final UserService userService;
 
     @Autowired
-    private ProductCatalogService productCatalogService;
-
-    @Autowired
-    private UserService userService;
+    public OrderServiceImpl(OrderRepository orderRepository, ProductCatalogService productCatalogService, UserService userService){
+        this.orderRepository = orderRepository;
+        this.productCatalogService = productCatalogService;
+        this.userService = userService;
+    }
 
     @Override
     public void placeOrder(OrderInfo orderInfo) throws OutOfStockException, NotFoundException, AuthenticationException {
@@ -40,19 +43,20 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public void cancelOrder(User user, Order order) {
-
-    }
-
-    @Override
     public void completeOrder(Long orderId) throws NotFoundException{
 
         Optional<Order> orderOptional = orderRepository.findById(orderId);
-        if(orderOptional.isPresent()) {
-            Order order = orderOptional.get();
-            orderRepository.delete(order);
+
+        if(orderOptional.isEmpty()){
+            throw new NotFoundException("Their are no active orders with given Id");
         }
-        throw new NotFoundException("Their are no active orders with given Id");
+        Order order = orderOptional.get();
+        orderRepository.delete(order);
+    }
+
+    @Override
+    public void cancelOrder(User user, Order order) {
+
     }
 
     @Override

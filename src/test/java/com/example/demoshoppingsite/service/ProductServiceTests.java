@@ -25,4 +25,11 @@ public class ProductServiceTests {
         productCatalogService.addProduct("Test Laptop", 10000, 20, user);
         assertTrue(true);
     }
+
+
+
+    @Test
+    public void removeProduct(){
+
+    }
 }
