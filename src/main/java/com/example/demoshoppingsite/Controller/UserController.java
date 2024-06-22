@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class UserController {
 
+    private final UserService userService;
 
     @Autowired
-    private UserService userService;
-
+    public UserController(UserService userService){
+        this.userService = userService;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<String> createUserAccount(@RequestBody User user) throws DuplicateException {
