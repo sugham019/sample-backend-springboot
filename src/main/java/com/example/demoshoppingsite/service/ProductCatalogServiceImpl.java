@@ -2,7 +2,6 @@ package com.example.demoshoppingsite.service;
 
 import com.example.demoshoppingsite.exceptions.NotFoundException;
 import com.example.demoshoppingsite.model.Item;
-import com.example.demoshoppingsite.model.ProductInfo;
 import com.example.demoshoppingsite.model.User;
 import com.example.demoshoppingsite.repository.ProductCatalogRepository;
 import com.example.demoshoppingsite.exceptions.OutOfStockException;
@@ -79,6 +78,15 @@ public class ProductCatalogServiceImpl implements ProductCatalogService{
             throw new NotFoundException("Could not find product with given Id");
 
         return optionalItem.get();
+    }
+
+    @Override
+    public Iterable<Item> getAllProducts() throws NotFoundException{
+
+        if(productCatalogRepository.count() == 0){
+            throw new NotFoundException("Their are no products available.");
+        }
+        return productCatalogRepository.findAll();
     }
 
 }

@@ -13,5 +13,6 @@ public interface ProductCatalogService {
     void updateStock(Long id, int num) throws NotFoundException, OutOfStockException;
     void updatePrice(Long id, int price) throws NotFoundException;
     Item getProductById(Long id) throws NotFoundException;
+    Iterable<Item> getAllProducts() throws NotFoundException;
 
 }
